@@ -1,8 +1,11 @@
 #include <iostream>
+#include <vector>
+#include <list>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_timer.h>
 #include <SDL2/SDL_ttf.h>
+
 
 
 using namespace std;
@@ -12,9 +15,10 @@ int main()
     if(SDL_Init(SDL_INIT_EVERYTHING) != 0){
         printf("%s", TTF_GetError());
     }
-    if(TTF_Init() != 0){
+    /*if(TTF_Init() != 0){
         printf("error");
-    }
+    }*/
+
     SDL_Window* win = SDL_CreateWindow("Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 800, 0);
     SDL_Renderer* render = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED);
     SDL_SetRenderDrawColor(render, 82, 26, 52, 255);
@@ -26,6 +30,16 @@ int main()
     SDL_Rect dest;
     SDL_QueryTexture(tex, NULL, NULL, &dest.w, &dest.h);
 
+    vector<vector<int>> collision;
+    collision.resize(2);
+    collision[0].push_back(400);
+    collision[0].push_back(500);
+    collision[0].push_back(50);
+    collision[0].push_back(200);
+    collision[1].push_back(100);
+    collision[1].push_back(100);
+    collision[1].push_back(30);
+    collision[1].push_back(100);
     SDL_Surface* surface2;
     surface2 = IMG_Load("untitled.png");
     //SDL_FillRect(surface, NULL, SDL_MapRGB(surface->format, 255, 0, 0));
@@ -33,6 +47,14 @@ int main()
     SDL_FreeSurface(surface2);
     SDL_Rect dest2;
     SDL_QueryTexture(tex2, NULL, NULL, &dest2.w, &dest2.h);
+
+    SDL_Surface* surface3;
+    surface3 = IMG_Load("untitled.png");
+    //SDL_FillRect(surface, NULL, SDL_MapRGB(surface->format, 255, 0, 0));
+    SDL_Texture* tex3 = SDL_CreateTextureFromSurface(render, surface3);
+    SDL_FreeSurface(surface3);
+    SDL_Rect dest3;
+    SDL_QueryTexture(tex2, NULL, NULL, &dest3.w, &dest3.h);
 
     /*TTF_Font* Sans = TTF_OpenFont("sans.ttf", 24);
     if(!Sans) {
@@ -52,6 +74,15 @@ int main()
     mess_rect.w = 100;
     mess_rect.h = 100;
 */
+    dest3.w = 30;
+    dest3.h = 100;;
+
+    // sets initial x-position of object
+    dest3.x = 100;
+
+    // sets initial y-position of object
+    dest3.y = 100;
+
     dest2.w = 50;
     dest2.h = 200;;
 
@@ -75,7 +106,7 @@ int main()
 
     // speed of box
     int speed = 300;
-
+    //return 0;
     // annimation loop
     while (!close) {
         SDL_Event event;
@@ -129,24 +160,27 @@ int main()
         if (dest.y < 0)
             dest.y = 0;
 
-        if(dest.y == dest2.y && dest.x >= dest2.x && dest.x < dest2.x + dest2.w)
-            dest.y = dest2.y - dest.h;
+        for(int i = 0; i < 2; ++i){
 
-        if(dest.y == dest2.y + dest2.h - dest.h && dest.x > dest2.x && dest.x < dest2.x + dest2.w)
-            dest.y = dest2.y + dest2.h;
+        if(dest.y == collision[i][1] && dest.x >= collision[i][0] && dest.x < collision[i][0] + collision[i][2])
+            dest.y = collision[i][1] - dest.h;
 
-        if(dest.x == dest2.x && dest.y >= dest2.y && dest.y < dest2.y + dest2.h)
-            dest.x = dest2.x - dest.w;
+        if(dest.y == collision[i][1] + collision[i][3] - dest.h && dest.x > collision[i][0] && dest.x < collision[i][0] + collision[i][2])
+            dest.y = collision[i][1] + collision[i][3];
 
-        if(dest.x == dest2.x + dest2.w - dest.w && dest.y > dest2.y && dest.y < dest2.y + dest2.h)
-            dest.x = dest2.x + dest2.w;
+        if(dest.x == collision[i][0] && dest.y >= collision[i][1] && dest.y < collision[i][1]+ collision[i][3])
+            dest.x = collision[i][0] - dest.w;
 
+        if(dest.x == collision[i][0] + collision[i][2] - dest.w && dest.y > collision[i][1] && dest.y < collision[i][1] + collision[i][3])
+            dest.x = collision[i][0] + collision[i][2];
+        }
 
 
         // clears the screen
         SDL_RenderClear(render);
         SDL_RenderCopy(render, tex, NULL, &dest);
         SDL_RenderCopy(render, tex2, NULL, &dest2);
+        SDL_RenderCopy(render, tex3, NULL, &dest3);
         //SDL_RenderCopy(render, mess, NULL, &mess_rect);
 
         // triggers the double buffers
@@ -160,6 +194,8 @@ int main()
     // destroy texture
     SDL_DestroyTexture(tex);
     SDL_DestroyTexture(tex2);
+    SDL_DestroyTexture(tex3);
+
 
     // destroy renderer
     SDL_DestroyRenderer(render);
