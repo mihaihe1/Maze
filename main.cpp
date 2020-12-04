@@ -34,7 +34,7 @@ int main()
     SDL_Rect dest2;
     SDL_QueryTexture(tex2, NULL, NULL, &dest2.w, &dest2.h);
 
-    TTF_Font* Sans = TTF_OpenFont("sans.ttf", 24);
+    /*TTF_Font* Sans = TTF_OpenFont("sans.ttf", 24);
     if(!Sans) {
     printf("TTF_OpenFont: %s\n", TTF_GetError());
    // handle error
@@ -51,18 +51,18 @@ int main()
     mess_rect.y = 200;
     mess_rect.w = 100;
     mess_rect.h = 100;
-
-    dest2.w /= 6;
-    dest2.h /= 6;
+*/
+    dest2.w = 50;
+    dest2.h = 200;;
 
     // sets initial x-position of object
-    dest2.x = 600;
+    dest2.x = 400;
 
     // sets initial y-position of object
-    dest2.y = 600;
+    dest2.y = 500;
 
-    dest.w /= 6;
-    dest.h /= 6;
+    dest.w = 10;
+    dest.h = 10;
 
     // sets initial x-position of object
     dest.x = 400;
@@ -111,7 +111,8 @@ int main()
                 }
             }
         }
-
+        cout<<dest.x<<" "<<dest.y<<" ";
+        cout<<dest2.x<<" "<<dest2.y<<"\n";
         // right boundary
         if (dest.x + dest.w > 800)
             dest.x = 800 - dest.w;
@@ -127,6 +128,20 @@ int main()
         // upper boundary
         if (dest.y < 0)
             dest.y = 0;
+
+        if(dest.y == dest2.y && dest.x >= dest2.x && dest.x < dest2.x + dest2.w)
+            dest.y = dest2.y - dest.h;
+
+        if(dest.y == dest2.y + dest2.h - dest.h && dest.x > dest2.x && dest.x < dest2.x + dest2.w)
+            dest.y = dest2.y + dest2.h;
+
+        if(dest.x == dest2.x && dest.y >= dest2.y && dest.y < dest2.y + dest2.h)
+            dest.x = dest2.x - dest.w;
+
+        if(dest.x == dest2.x + dest2.w - dest.w && dest.y > dest2.y && dest.y < dest2.y + dest2.h)
+            dest.x = dest2.x + dest2.w;
+
+
 
         // clears the screen
         SDL_RenderClear(render);
