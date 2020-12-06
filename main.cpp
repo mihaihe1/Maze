@@ -19,7 +19,7 @@ int main()
         printf("error");
     }*/
 
-    SDL_Window* win = SDL_CreateWindow("Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 800, 0);
+    SDL_Window* win = SDL_CreateWindow("Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 400, 400, 0);
     SDL_Renderer* render = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED);
     SDL_SetRenderDrawColor(render, 82, 26, 52, 255);
     SDL_Surface* surface;
@@ -42,17 +42,17 @@ int main()
     collision[1].push_back(100);
     SDL_Surface* surface2;
     surface2 = IMG_Load("untitled.png");
-    //SDL_FillRect(surface, NULL, SDL_MapRGB(surface->format, 255, 0, 0));
     SDL_Texture* tex2 = SDL_CreateTextureFromSurface(render, surface2);
-    SDL_FreeSurface(surface2);
+    //SDL_FreeSurface(surface2);
     SDL_Rect dest2;
     SDL_QueryTexture(tex2, NULL, NULL, &dest2.w, &dest2.h);
 
     SDL_Surface* surface3;
-    surface3 = IMG_Load("untitled.png");
+    surface3 = SDL_CreateRGBSurface(0, 30, 100, 32, 0, 0, 0, 0);
+    SDL_FillRect(surface3, NULL, SDL_MapRGB(surface3->format, 255, 0, 0));
     //SDL_FillRect(surface, NULL, SDL_MapRGB(surface->format, 255, 0, 0));
-    SDL_Texture* tex3 = SDL_CreateTextureFromSurface(render, surface3);
-    SDL_FreeSurface(surface3);
+    SDL_Texture* tex3 = SDL_CreateTextureFromSurface(render, surface2);
+    SDL_FreeSurface(surface2);
     SDL_Rect dest3;
     SDL_QueryTexture(tex2, NULL, NULL, &dest3.w, &dest3.h);
 
