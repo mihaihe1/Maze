@@ -17,8 +17,8 @@ int nWalls;
 
 const int playerWidth = 10;
 const int playerHeight = 10;
-int playerStartX = 400;
-int playerStartY = 400;
+int playerStartX = 50;
+int playerStartY = 30;
 
 const int speed = 300;
 
@@ -54,6 +54,22 @@ int main()
     SDL_Rect dest;
     SDL_QueryTexture(playerTex, NULL, NULL, &dest.w, &dest.h);
 
+    SDL_Surface* endSquare;
+    endSquare = SDL_CreateRGBSurface(0, 10, 10, 32, 0, 0, 0, 0);
+    SDL_FillRect(endSquare, NULL, SDL_MapRGB(endSquare->format, 0, 255, 0));
+    SDL_Texture* endSqTex = SDL_CreateTextureFromSurface(render, endSquare);
+    SDL_FreeSurface(endSquare);
+    SDL_Rect endpoz;
+    SDL_QueryTexture(endSqTex, NULL, NULL, &endpoz.w, &endpoz.h);
+    endpoz.w = 10;
+    endpoz.h = 10;
+
+    // sets initial x-position of object
+    endpoz.x = 790;
+
+    // sets initial y-position of object
+    endpoz.y = 790;
+
     SDL_Surface* endSurface;
     endSurface = IMG_Load("end.png");
     SDL_Texture* endTex = SDL_CreateTextureFromSurface(render, endSurface);
@@ -67,7 +83,9 @@ int main()
     f >> nWalls;
     SDL_Rect* d = new SDL_Rect[nWalls];
     for(int i = 0; i < nWalls; ++i){
-        surface = SDL_CreateRGBSurface(0, 30, 100, 32, 0, 30, 0, 0);
+        surface = SDL_CreateRGBSurface(0, 10, 10, 32, 0, 0, 0, 0);
+        SDL_FillRect(surface, NULL, SDL_MapRGB(surface->format, 255, 255, 255));
+        //surface = SDL_CreateRGBSurface(0, 30, 100, 32, 0, 30, 0, 0);
         SDL_Texture* t = SDL_CreateTextureFromSurface(render, surface);
         SDL_FreeSurface(surface);
         tex.push_back(t);
@@ -154,6 +172,19 @@ int main()
             SDL_RenderClear(render);
             SDL_RenderCopy(render, endTex, NULL, NULL);
             SDL_RenderPresent(render);
+            SDL_Event event1;
+        // Events mangement
+        while (SDL_PollEvent(&event1)) {
+            switch (event1.type) {
+                case SDL_KEYDOWN:
+                // keyboard API for key pressed
+                switch (event1.key.keysym.scancode) {
+                case SDL_SCANCODE_Q:
+                    close = 1;
+                    break;
+                }
+            }
+        }
         }
         else{
         if(dest.x == 790 && dest.y == 790)
@@ -177,7 +208,7 @@ int main()
         if (dest.y < 0)
             dest.y = 0;
 
-        for(int i = 0; i < 2; ++i){
+        for(int i = 0; i < nWalls; ++i){
         int x,y,w,h;
         x = collision[i].get_x();
         y = collision[i].get_y();
@@ -201,6 +232,7 @@ int main()
 
         SDL_RenderClear(render);
         SDL_RenderCopy(render, playerTex, NULL, &dest);
+        SDL_RenderCopy(render, endSqTex, NULL, &endpoz);
         for(int i = 0; i < nWalls; ++i){
             SDL_RenderCopy(render, tex[i], NULL, &d[i]);
         }
