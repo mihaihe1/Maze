@@ -1,4 +1,5 @@
 #include <iostream>
+#include <bits/stdc++.h>
 #include <vector>
 #include <list>
 #include <SDL2/SDL.h>
@@ -77,6 +78,38 @@ int main()
     SDL_Rect endScreen;
     SDL_QueryTexture(endTex, NULL, NULL, &endScreen.w, &endScreen.h);
 
+   /* SDL_Surface* mainMenu;
+    mainMenu = IMG_Load("start_menu.png");
+    SDL_Texture* menuTex = SDL_CreateTextureFromSurface(render, mainMenu);
+    SDL_FreeSurface(mainMenu);
+    SDL_Rect menuScreen;
+    SDL_QueryTexture(menuTex, NULL, NULL, &menuScreen.w, &menuScreen.h);
+    */
+
+    SDL_Surface* newGame;
+    newGame = IMG_Load("new_game.png");
+    SDL_Texture* newGameTex = SDL_CreateTextureFromSurface(render, newGame);
+    SDL_FreeSurface(newGame);
+    SDL_Rect newGamePoz;
+    SDL_QueryTexture(newGameTex, NULL, NULL, &newGamePoz.w, &newGamePoz.h);
+    newGamePoz.w = 400;
+    newGamePoz.h = 50;
+    newGamePoz.x = 200;
+    newGamePoz.y = 200;
+
+    SDL_Surface* quitGame;
+    quitGame = IMG_Load("quit_game.png");
+    SDL_Texture* quitGameTex = SDL_CreateTextureFromSurface(render, quitGame);
+    SDL_FreeSurface(quitGame);
+    SDL_Rect quitGamePoz;
+    SDL_QueryTexture(quitGameTex, NULL, NULL, &quitGamePoz.w, &quitGamePoz.h);
+    quitGamePoz.w = 400;
+    quitGamePoz.h = 50;
+    quitGamePoz.x = 200;
+    quitGamePoz.y = 500;
+
+
+
     vector <SDL_Texture*> tex;
 
     SDL_Surface* surface;
@@ -135,8 +168,43 @@ int main()
     //return 0;
     // annimation loop
     int img_end = 0;
-    while (!close) {
+
+    stack <string> game_state;
+    game_state.push("QUIT");
+    game_state.push("MENU");
+    while (game_state.top() != "QUIT") {
         SDL_Event event;
+        string state = game_state.top();
+        if(state == "MENU"){
+            while(SDL_PollEvent(&event)){
+                switch (event.type) {
+                    case SDL_QUIT:
+                        game_state.pop();
+                        break;
+
+                    case SDL_MOUSEBUTTONDOWN:
+                        if(event.motion.x >= 200 && event.motion.y >= 200)
+                            {
+                                game_state.pop();
+                                break;
+                            }
+
+                }
+            }
+        SDL_RenderClear(render);
+        SDL_RenderCopy(render, menuTex, NULL, &menuScreen);
+        SDL_RenderCopy(render, newGameTex, NULL, &newGamePoz);
+        SDL_RenderCopy(render, quitGameTex, NULL, &quitGamePoz);
+
+        // triggers the double buffers
+        // for multiple rendering
+        SDL_RenderPresent(render);
+
+        // calculates to 60 fps
+        SDL_Delay(800 / 60);
+
+        }
+        /*
         // Events mangement
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
@@ -244,6 +312,7 @@ int main()
         // calculates to 60 fps
         SDL_Delay(800 / 60);
         }
+    }*/
     }
 
     // destroy texture
