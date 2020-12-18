@@ -183,16 +183,23 @@ int main()
                         break;
 
                     case SDL_MOUSEBUTTONDOWN:
-                        if(event.motion.x >= 200 && event.motion.y >= 200)
+                        if(event.motion.x >= newGamePoz.x && event.motion.x <= newGamePoz.x + newGamePoz.w
+                            && event.motion.y >= newGamePoz.y && event.motion.y <= newGamePoz.y + newGamePoz.h)
+                            {
+                                game_state.pop();
+                                game_state.push("GAME");
+                                break;
+                            }
+                        if(event.motion.x >= quitGamePoz.x && event.motion.x <= quitGamePoz.x + quitGamePoz.w
+                            && event.motion.y >= quitGamePoz.y && event.motion.y <= quitGamePoz.y + quitGamePoz.h)
                             {
                                 game_state.pop();
                                 break;
                             }
-
                 }
             }
         SDL_RenderClear(render);
-        SDL_RenderCopy(render, menuTex, NULL, &menuScreen);
+        //SDL_RenderCopy(render, menuTex, NULL, &menuScreen);
         SDL_RenderCopy(render, newGameTex, NULL, &newGamePoz);
         SDL_RenderCopy(render, quitGameTex, NULL, &quitGamePoz);
 
@@ -204,14 +211,14 @@ int main()
         SDL_Delay(800 / 60);
 
         }
-        /*
+        else if(state == "GAME"){
         // Events mangement
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
 
             case SDL_QUIT:
                 // handling of close button
-                close = 1;
+                game_state.pop();
                 break;
 
             case SDL_KEYDOWN:
@@ -236,27 +243,14 @@ int main()
                 }
             }
         }
-        if(img_end == 1){
-            SDL_RenderClear(render);
-            SDL_RenderCopy(render, endTex, NULL, NULL);
-            SDL_RenderPresent(render);
-            SDL_Event event1;
-        // Events mangement
-        while (SDL_PollEvent(&event1)) {
-            switch (event1.type) {
-                case SDL_KEYDOWN:
-                // keyboard API for key pressed
-                switch (event1.key.keysym.scancode) {
-                case SDL_SCANCODE_Q:
-                    close = 1;
-                    break;
-                }
-            }
-        }
-        }
-        else{
+
         if(dest.x == 790 && dest.y == 790)
-            img_end = 1;
+            {
+                game_state.pop();
+                game_state.pop();
+                game_state.push("ENDING");
+            }
+        else{
 
         cout<<dest.x<<" "<<dest.y<<"\n";
         //cout<<dest2.x<<" "<<dest2.y<<"\n";
@@ -304,6 +298,7 @@ int main()
         for(int i = 0; i < nWalls; ++i){
             SDL_RenderCopy(render, tex[i], NULL, &d[i]);
         }
+        }
 
         // triggers the double buffers
         // for multiple rendering
@@ -311,12 +306,35 @@ int main()
 
         // calculates to 60 fps
         SDL_Delay(800 / 60);
+
         }
-    }*/
+        else if(state == "ENDING"){
+            SDL_RenderClear(render);
+            SDL_RenderCopy(render, endTex, NULL, NULL);
+            SDL_RenderPresent(render);
+            SDL_Delay(800 / 60);
+            SDL_Event event1;
+        // Events mangement
+            while (SDL_PollEvent(&event1)) {
+                switch (event1.type) {
+                    case SDL_KEYDOWN:
+                    // keyboard API for key pressed
+                    switch (event1.key.keysym.scancode) {
+                    case SDL_SCANCODE_Q:
+                        game_state.pop();
+                        break;
+                    }
+                }
+
+            }
+        }
     }
 
     // destroy texture
     SDL_DestroyTexture(playerTex);
+    SDL_DestroyTexture(newGameTex);
+    SDL_DestroyTexture(quitGameTex);
+    SDL_DestroyTexture(endTex);
     for(int i = 0; i < nWalls; ++i){
         SDL_DestroyTexture(tex[i]);
     }
