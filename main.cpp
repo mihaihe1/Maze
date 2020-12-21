@@ -108,6 +108,16 @@ int main()
     quitGamePoz.x = 200;
     quitGamePoz.y = 500;
 
+    SDL_Surface* resumeGame;
+    resumeGame = IMG_Load("resume_game.png");
+    SDL_Texture* resumeGameTex = SDL_CreateTextureFromSurface(render, resumeGame);
+    SDL_FreeSurface(resumeGame);
+    SDL_Rect resumeGamePoz;
+    SDL_QueryTexture(resumeGameTex, NULL, NULL, &resumeGamePoz.w, &resumeGamePoz.h);
+    resumeGamePoz.w = 400;
+    resumeGamePoz.h = 50;
+    resumeGamePoz.x = 200;
+    resumeGamePoz.y = 200;
 
 
     vector <SDL_Texture*> tex;
@@ -224,6 +234,9 @@ int main()
             case SDL_KEYDOWN:
                 // keyboard API for key pressed
                 switch (event.key.keysym.scancode) {
+                case SDL_SCANCODE_ESCAPE:
+                    game_state.push("PAUSE");
+                    break;
                 case SDL_SCANCODE_W:
                 case SDL_SCANCODE_UP:
                     dest.y -= speed / 30;
@@ -246,7 +259,6 @@ int main()
 
         if(dest.x == 790 && dest.y == 790)
             {
-                game_state.pop();
                 game_state.pop();
                 game_state.push("ENDING");
             }
@@ -327,6 +339,57 @@ int main()
                 }
 
             }
+        }
+        else if(state == "PAUSE"){
+
+            while(SDL_PollEvent(&event)){
+                switch (event.type) {
+                    /*case SDL_KEYDOWN:
+                    // keyboard API for key pressed
+                    switch (event.key.keysym.scancode) {
+                    case SDL_SCANCODE_ESCAPE:
+                        game_state.pop();
+                        break;
+                    }*/
+                    case SDL_QUIT:
+                        game_state.pop();
+                        game_state.pop();
+                        break;
+
+                    case SDL_MOUSEBUTTONDOWN:
+                        if(event.motion.x >= resumeGamePoz.x && event.motion.x <= resumeGamePoz.x + resumeGamePoz.w
+                            && event.motion.y >= resumeGamePoz.y && event.motion.y <= resumeGamePoz.y + resumeGamePoz.h)
+                            {
+                                game_state.pop();
+                                break;
+                            }
+                        if(event.motion.x >= quitGamePoz.x && event.motion.x <= quitGamePoz.x + quitGamePoz.w
+                            && event.motion.y >= quitGamePoz.y && event.motion.y <= quitGamePoz.y + quitGamePoz.h)
+                            {
+                                game_state.pop();
+                                game_state.pop();
+                                break;
+                            }
+                    case SDL_KEYDOWN:
+                    // keyboard API for key pressed
+                    switch (event.key.keysym.scancode) {
+                    case SDL_SCANCODE_ESCAPE:
+                        game_state.pop();
+                        break;
+                    }
+                }
+            }
+        SDL_RenderClear(render);
+        //SDL_RenderCopy(render, menuTex, NULL, &menuScreen);
+        SDL_RenderCopy(render, resumeGameTex, NULL, &resumeGamePoz);
+        SDL_RenderCopy(render, quitGameTex, NULL, &quitGamePoz);
+
+        // triggers the double buffers
+        // for multiple rendering
+        SDL_RenderPresent(render);
+
+        // calculates to 60 fps
+        SDL_Delay(800 / 60);
         }
     }
 
