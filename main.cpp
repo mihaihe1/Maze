@@ -182,6 +182,14 @@ int main()
     stack <string> game_state;
     game_state.push("QUIT");
     game_state.push("MENU");
+    unsigned int start = 0;
+    start = SDL_GetTicks();
+    unsigned int timer = 0;
+
+    bool started = false;
+
+    unsigned int total = 0;
+
     while (game_state.top() != "QUIT") {
         SDL_Event event;
         string state = game_state.top();
@@ -222,6 +230,11 @@ int main()
 
         }
         else if(state == "GAME"){
+        if(!started){
+            start = SDL_GetTicks();
+          //  start += timer;
+            started = true;
+        }
         // Events mangement
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
@@ -236,6 +249,8 @@ int main()
                 switch (event.key.keysym.scancode) {
                 case SDL_SCANCODE_ESCAPE:
                     game_state.push("PAUSE");
+                    total += SDL_GetTicks() - start;
+                    started = false;
                     break;
                 case SDL_SCANCODE_W:
                 case SDL_SCANCODE_UP:
@@ -263,8 +278,8 @@ int main()
                 game_state.push("ENDING");
             }
         else{
-
-        cout<<dest.x<<" "<<dest.y<<"\n";
+        cout<<SDL_GetTicks() - start<<"\n";
+        //cout<<dest.x<<" "<<dest.y<<"\n";
         //cout<<dest2.x<<" "<<dest2.y<<"\n";
         // right boundary
         if (dest.x + dest.w > 800)
@@ -341,7 +356,9 @@ int main()
             }
         }
         else if(state == "PAUSE"){
-
+            unsigned int t = 100;
+            cout << start <<"\n";
+            cout << start + t <<"\n";
             while(SDL_PollEvent(&event)){
                 switch (event.type) {
                     /*case SDL_KEYDOWN:
