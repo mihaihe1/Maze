@@ -274,6 +274,7 @@ int main()
 
         if(dest.x == 790 && dest.y == 790)
             {
+                total += SDL_GetTicks() - start;
                 game_state.pop();
                 game_state.push("ENDING");
             }
@@ -358,7 +359,7 @@ int main()
         else if(state == "PAUSE"){
             unsigned int t = 100;
             cout << start <<"\n";
-            cout << start + t <<"\n";
+            //cout << start + t <<"\n";
             while(SDL_PollEvent(&event)){
                 switch (event.type) {
                     /*case SDL_KEYDOWN:
@@ -418,7 +419,7 @@ int main()
     for(int i = 0; i < nWalls; ++i){
         SDL_DestroyTexture(tex[i]);
     }
-
+    cout << total;
     delete []d;
     // destroy renderer
     SDL_DestroyRenderer(render);
