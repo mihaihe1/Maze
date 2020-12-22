@@ -20,6 +20,7 @@ const int playerWidth = 10;
 const int playerHeight = 10;
 int playerStartX = 50;
 int playerStartY = 30;
+const int nLevels = 2;
 
 const int speed = 300;
 
@@ -154,15 +155,12 @@ int main()
     // speed of box
     //return 0;
     // annimation loop
-    int n = 3;
-    int img_end = 0;
     int cnt = 0;
     stack <string> game_state;
     game_state.push("QUIT");
     game_state.push("MENU");
     unsigned int start = 0;
     start = SDL_GetTicks();
-    unsigned int timer = 0;
 
     bool started = false;
     bool create_level = false;
@@ -213,10 +211,10 @@ int main()
 
                 SDL_Surface* surface;
                 f >> nWalls;
-                if(cnt == 0)
-                    d = new SDL_Rect[6];
 
-                for(int i = cnt*n; i < cnt * n + nWalls; ++i){
+                d = new SDL_Rect[nWalls];
+
+                for(int i = 0; i < nWalls; ++i){
                     surface = SDL_CreateRGBSurface(0, 10, 10, 32, 0, 0, 0, 0);
                     SDL_FillRect(surface, NULL, SDL_MapRGB(surface->format, 255, 255, 255));
                     //surface = SDL_CreateRGBSurface(0, 30, 100, 32, 0, 30, 0, 0);
@@ -228,13 +226,13 @@ int main()
 
                 read_walls();
 
-                for(int i = cnt*n; i < cnt*n+nWalls; ++i){
+                for(int i = 0; i < nWalls; ++i){
                     d[i].x = collision[i].get_x();
                     d[i].y = collision[i].get_y();
                     d[i].w = collision[i].get_w();
                     d[i].h = collision[i].get_h();
                 }
-
+            //cnt++;
             create_level = true;
 
         }
@@ -287,17 +285,21 @@ int main()
                 total += SDL_GetTicks() - start;
                 //game_state.pop();
                 //game_state.push("ENDING");
-                //for(int i = 0; i < nWalls; ++i){
-                //    SDL_DestroyTexture(tex[i]);
-                //}
-                //tex.clear();
-                //collision.clear();
+                for(int i = 0; i < nWalls; ++i){
+                    SDL_DestroyTexture(tex[i]);
+                }
+                tex.clear();
+                collision.clear();
                 //delete []d;
                 cnt++;
+                if(cnt == nLevels){
+                    game_state.pop();
+                    game_state.push("ENDING");
+                }
                 create_level = false;
             }
         else{
-       cout <<cnt;
+       //cout <<cnt;
         cout<<SDL_GetTicks() - start<<"\n";
 
         //cout<<dest.x<<" "<<dest.y<<"\n";
@@ -318,7 +320,7 @@ int main()
         if (dest.y < 0)
             dest.y = 0;
 
-        for(int i = cnt*n; i < cnt*n+nWalls; ++i){
+        for(int i = 0; i < nWalls; ++i){
         int x,y,w,h;
         x = collision[i].get_x();
         y = collision[i].get_y();
@@ -343,7 +345,7 @@ int main()
         SDL_RenderClear(render);
         SDL_RenderCopy(render, playerTex, NULL, &dest);
         SDL_RenderCopy(render, endSqTex, NULL, &endpoz);
-        for(int i = cnt*n; i < cnt*n+nWalls; ++i){
+        for(int i = 0; i < nWalls; ++i){
             SDL_RenderCopy(render, tex[i], NULL, &d[i]);
         }
         }
