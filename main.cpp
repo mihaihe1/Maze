@@ -123,7 +123,7 @@ int main()
     retryGamePoz.w = 400;
     retryGamePoz.h = 50;
     retryGamePoz.x = 200;
-    retryGamePoz.y = 300;
+    retryGamePoz.y = 400;
 
     SDL_Surface* wonGame;
     wonGame = IMG_Load("resources/won.png");
@@ -185,13 +185,14 @@ int main()
     game_state.push("QUIT");
     game_state.push("MENU");
     unsigned int start = 0;
-    start = SDL_GetTicks();
+
     unsigned int copie = start;
     bool started = false;
     bool create_level = false;
-
+    bool paused = false;
     unsigned int total = 0;
     bool winning = false;
+    unsigned int in;
     while (game_state.top() != "QUIT") {
         SDL_Event event;
         string state = game_state.top();
@@ -232,6 +233,15 @@ int main()
 
         }
         else if(state == "GAME"){
+        if(!started){
+            start = SDL_GetTicks();
+            started = true;
+        }
+        //cout<<SDL_GetTicks()<<" "<<total<<" "<<start<<"\n";
+        if(SDL_GetTicks() - total - start >= 35000){
+            game_state.pop();
+            game_state.push("ENDING");
+        }
         if(!create_level){
 
                 SDL_Surface* surface;
@@ -261,12 +271,8 @@ int main()
             create_level = true;
 
         }
-        if(!started){
-            start = SDL_GetTicks();
-          //  start += timer;
-            started = true;
-        }
-        // Events mangement
+
+        // Events management
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
 
@@ -280,8 +286,6 @@ int main()
                 switch (event.key.keysym.scancode) {
                 case SDL_SCANCODE_ESCAPE:
                     game_state.push("PAUSE");
-                    total += SDL_GetTicks() - start;
-                    started = false;
                     break;
                 case SDL_SCANCODE_W:
                 case SDL_SCANCODE_UP:
@@ -307,7 +311,7 @@ int main()
             {
                 dest.x = 100;
                 dest.y = 100;
-                total += SDL_GetTicks() - start;
+                //total += SDL_GetTicks() - start;
                 //game_state.pop();
                 //game_state.push("ENDING");
                 for(int i = 0; i < nWalls; ++i){
@@ -321,14 +325,14 @@ int main()
                     game_state.pop();
                     game_state.push("ENDING");
                     cout<<"final\n";
-                    cout<< SDL_GetTicks() - start;
+                    cout<< SDL_GetTicks() - total - start;
                     winning = true;
                 }
                 create_level = false;
             }
         else{
        //cout <<cnt;
-        cout<<SDL_GetTicks() - start<<"\n";
+        //cout<<SDL_GetTicks() - start<<"\n";
 
         //cout<<dest.x<<" "<<dest.y<<"\n";
         //cout<<dest2.x<<" "<<dest2.y<<"\n";
@@ -389,7 +393,7 @@ int main()
         else if(state == "ENDING"){
             SDL_RenderClear(render);
             if(!winning){
-            SDL_RenderCopy(render, wonGameTex, NULL, &wonGamePoz);
+            SDL_RenderCopy(render, lostGameTex, NULL, &lostGamePoz);
             SDL_RenderCopy(render, retryGameTex, NULL, &retryGamePoz);
             }
             else{
@@ -404,6 +408,26 @@ int main()
         // Events mangement
             while (SDL_PollEvent(&event1)) {
                 switch (event1.type) {
+                    case SDL_QUIT:
+                        game_state.pop();
+                        game_state.pop();
+                        break;
+
+                    case SDL_MOUSEBUTTONDOWN:
+                        if(event1.motion.x >= retryGamePoz.x && event1.motion.x <= retryGamePoz.x + retryGamePoz.w
+                            && event1.motion.y >= retryGamePoz.y && event1.motion.y <= retryGamePoz.y + retryGamePoz.h)
+                            {
+                                game_state.pop();
+                                game_state.push("GAME");
+                                break;
+                            }
+                        if(event1.motion.x >= quitGamePoz.x && event1.motion.x <= quitGamePoz.x + quitGamePoz.w
+                            && event1.motion.y >= quitGamePoz.y && event1.motion.y <= quitGamePoz.y + quitGamePoz.h)
+                            {
+                                game_state.pop();
+                                game_state.pop();
+                                break;
+                            }
                     case SDL_KEYDOWN:
                     // keyboard API for key pressed
                     switch (event1.key.keysym.scancode) {
@@ -416,8 +440,12 @@ int main()
             }
         }
         else if(state == "PAUSE"){
-            unsigned int t = 100;
-            cout << start <<"\n";
+            if(!paused){
+                in = SDL_GetTicks();
+                paused = true;
+            }
+            cout << in <<"\n";
+            //cout << start <<"\n";
             //cout << start + t <<"\n";
             while(SDL_PollEvent(&event)){
                 switch (event.type) {
@@ -437,6 +465,8 @@ int main()
                         if(event.motion.x >= resumeGamePoz.x && event.motion.x <= resumeGamePoz.x + resumeGamePoz.w
                             && event.motion.y >= resumeGamePoz.y && event.motion.y <= resumeGamePoz.y + resumeGamePoz.h)
                             {
+                                paused = false;
+                                total += SDL_GetTicks() - in;
                                 game_state.pop();
                                 break;
                             }
@@ -451,6 +481,8 @@ int main()
                     // keyboard API for key pressed
                     switch (event.key.keysym.scancode) {
                     case SDL_SCANCODE_ESCAPE:
+                        paused = false;
+                        total += SDL_GetTicks() - in;
                         game_state.pop();
                         break;
                     }
@@ -474,10 +506,14 @@ int main()
     SDL_DestroyTexture(playerTex);
     SDL_DestroyTexture(newGameTex);
     SDL_DestroyTexture(quitGameTex);
+    SDL_DestroyTexture(retryGameTex);
+    SDL_DestroyTexture(resumeGameTex);
+    SDL_DestroyTexture(wonGameTex);
+    SDL_DestroyTexture(lostGameTex);
     for(int i = 0; i < nWalls; ++i){
         SDL_DestroyTexture(tex[i]);
     }
-    cout << copie;
+
     delete []d;
     // destroy renderer
     SDL_DestroyRenderer(render);
