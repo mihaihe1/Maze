@@ -235,12 +235,16 @@ int main()
         else if(state == "GAME"){
         if(!started){
             start = SDL_GetTicks();
+            //total = 0;
             started = true;
         }
-        //cout<<SDL_GetTicks()<<" "<<total<<" "<<start<<"\n";
+        unsigned int t = 999999;
+        if(SDL_GetTicks() < t){
+        cout<<SDL_GetTicks()<<" "<<total<<" "<<start<<"\n";
         if(SDL_GetTicks() - total - start >= 35000){
             game_state.pop();
             game_state.push("ENDING");
+        }
         }
         if(!create_level){
 
@@ -409,7 +413,7 @@ int main()
             while (SDL_PollEvent(&event1)) {
                 switch (event1.type) {
                     case SDL_QUIT:
-                        game_state.pop();
+                        //game_state.pop();
                         game_state.pop();
                         break;
 
@@ -419,13 +423,19 @@ int main()
                             {
                                 game_state.pop();
                                 game_state.push("GAME");
+                                f.clear();
+                                f.seekg(0, f.beg);
+                                cnt = 0;
+                                started = false;
+                                winning = false;
                                 break;
                             }
                         if(event1.motion.x >= quitGamePoz.x && event1.motion.x <= quitGamePoz.x + quitGamePoz.w
                             && event1.motion.y >= quitGamePoz.y && event1.motion.y <= quitGamePoz.y + quitGamePoz.h)
                             {
                                 game_state.pop();
-                                game_state.pop();
+
+                           //     game_state.pop();
                                 break;
                             }
                     case SDL_KEYDOWN:
