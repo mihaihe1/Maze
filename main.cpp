@@ -50,7 +50,7 @@ int main()
     SDL_SetRenderDrawColor(render, 82, 26, 52, 255);
     //CREATING THE PLAYER
     SDL_Surface* playerSurface;
-    playerSurface = IMG_Load("untitled.png");
+    playerSurface = IMG_Load("resources/untitled.png");
     //SDL_FillRect(surface, NULL, SDL_MapRGB(surface->format, 255, 0, 0));
     SDL_Texture* playerTex = SDL_CreateTextureFromSurface(render, playerSurface);
     SDL_FreeSurface(playerSurface);
@@ -73,13 +73,6 @@ int main()
     // sets initial y-position of object
     endpoz.y = 790;
 
-    SDL_Surface* endSurface;
-    endSurface = IMG_Load("end.png");
-    SDL_Texture* endTex = SDL_CreateTextureFromSurface(render, endSurface);
-    SDL_FreeSurface(endSurface);
-    SDL_Rect endScreen;
-    SDL_QueryTexture(endTex, NULL, NULL, &endScreen.w, &endScreen.h);
-
    /* SDL_Surface* mainMenu;
     mainMenu = IMG_Load("start_menu.png");
     SDL_Texture* menuTex = SDL_CreateTextureFromSurface(render, mainMenu);
@@ -89,7 +82,7 @@ int main()
     */
 
     SDL_Surface* newGame;
-    newGame = IMG_Load("new_game.png");
+    newGame = IMG_Load("resources/new_game.png");
     SDL_Texture* newGameTex = SDL_CreateTextureFromSurface(render, newGame);
     SDL_FreeSurface(newGame);
     SDL_Rect newGamePoz;
@@ -100,7 +93,7 @@ int main()
     newGamePoz.y = 200;
 
     SDL_Surface* quitGame;
-    quitGame = IMG_Load("quit_game.png");
+    quitGame = IMG_Load("resources/quit_game.png");
     SDL_Texture* quitGameTex = SDL_CreateTextureFromSurface(render, quitGame);
     SDL_FreeSurface(quitGame);
     SDL_Rect quitGamePoz;
@@ -111,7 +104,7 @@ int main()
     quitGamePoz.y = 500;
 
     SDL_Surface* resumeGame;
-    resumeGame = IMG_Load("resume_game.png");
+    resumeGame = IMG_Load("resources/resume_game.png");
     SDL_Texture* resumeGameTex = SDL_CreateTextureFromSurface(render, resumeGame);
     SDL_FreeSurface(resumeGame);
     SDL_Rect resumeGamePoz;
@@ -121,6 +114,38 @@ int main()
     resumeGamePoz.x = 200;
     resumeGamePoz.y = 200;
 
+    SDL_Surface* retryGame;
+    retryGame = IMG_Load("resources/retry.png");
+    SDL_Texture* retryGameTex = SDL_CreateTextureFromSurface(render, retryGame);
+    SDL_FreeSurface(retryGame);
+    SDL_Rect retryGamePoz;
+    SDL_QueryTexture(retryGameTex, NULL, NULL, &retryGamePoz.w, &retryGamePoz.h);
+    retryGamePoz.w = 400;
+    retryGamePoz.h = 50;
+    retryGamePoz.x = 200;
+    retryGamePoz.y = 300;
+
+    SDL_Surface* wonGame;
+    wonGame = IMG_Load("resources/won.png");
+    SDL_Texture* wonGameTex = SDL_CreateTextureFromSurface(render, wonGame);
+    SDL_FreeSurface(wonGame);
+    SDL_Rect wonGamePoz;
+    SDL_QueryTexture(wonGameTex, NULL, NULL, &wonGamePoz.w, &wonGamePoz.h);
+    wonGamePoz.w = 400;
+    wonGamePoz.h = 50;
+    wonGamePoz.x = 200;
+    wonGamePoz.y = 100;
+
+    SDL_Surface* lostGame;
+    lostGame = IMG_Load("resources/lost.png");
+    SDL_Texture* lostGameTex = SDL_CreateTextureFromSurface(render, lostGame);
+    SDL_FreeSurface(lostGame);
+    SDL_Rect lostGamePoz;
+    SDL_QueryTexture(lostGameTex, NULL, NULL, &lostGamePoz.w, &lostGamePoz.h);
+    lostGamePoz.w = 400;
+    lostGamePoz.h = 50;
+    lostGamePoz.x = 200;
+    lostGamePoz.y = 100;
     /*TTF_Font* Sans = TTF_OpenFont("sans.ttf", 24);
     if(!Sans) {
     printf("TTF_OpenFont: %s\n", TTF_GetError());
@@ -161,12 +186,12 @@ int main()
     game_state.push("MENU");
     unsigned int start = 0;
     start = SDL_GetTicks();
-
+    unsigned int copie = start;
     bool started = false;
     bool create_level = false;
 
     unsigned int total = 0;
-
+    bool winning = false;
     while (game_state.top() != "QUIT") {
         SDL_Event event;
         string state = game_state.top();
@@ -295,6 +320,9 @@ int main()
                 if(cnt == nLevels){
                     game_state.pop();
                     game_state.push("ENDING");
+                    cout<<"final\n";
+                    cout<< SDL_GetTicks() - start;
+                    winning = true;
                 }
                 create_level = false;
             }
@@ -360,7 +388,16 @@ int main()
         }
         else if(state == "ENDING"){
             SDL_RenderClear(render);
-            SDL_RenderCopy(render, endTex, NULL, NULL);
+            if(!winning){
+            SDL_RenderCopy(render, wonGameTex, NULL, &wonGamePoz);
+            SDL_RenderCopy(render, retryGameTex, NULL, &retryGamePoz);
+            }
+            else{
+            newGamePoz.y = 400;
+            SDL_RenderCopy(render, wonGameTex, NULL, &wonGamePoz);
+            SDL_RenderCopy(render, newGameTex, NULL, &newGamePoz);
+            }
+            SDL_RenderCopy(render, quitGameTex, NULL, &quitGamePoz);
             SDL_RenderPresent(render);
             SDL_Delay(800 / 60);
             SDL_Event event1;
@@ -437,11 +474,10 @@ int main()
     SDL_DestroyTexture(playerTex);
     SDL_DestroyTexture(newGameTex);
     SDL_DestroyTexture(quitGameTex);
-    SDL_DestroyTexture(endTex);
     for(int i = 0; i < nWalls; ++i){
         SDL_DestroyTexture(tex[i]);
     }
-    cout << total;
+    cout << copie;
     delete []d;
     // destroy renderer
     SDL_DestroyRenderer(render);
