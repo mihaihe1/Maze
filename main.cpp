@@ -67,10 +67,10 @@ int main()
     endpoz.w = 10;
     endpoz.h = 10;
 
-    // sets initial x-position of object
+    // green square x
     endpoz.x = 790;
 
-    // sets initial y-position of object
+    // green square y
     endpoz.y = 790;
 
    /* SDL_Surface* mainMenu;
@@ -80,6 +80,8 @@ int main()
     SDL_Rect menuScreen;
     SDL_QueryTexture(menuTex, NULL, NULL, &menuScreen.w, &menuScreen.h);
     */
+
+    // --------IMGs-----------------
 
     SDL_Surface* newGame;
     newGame = IMG_Load("resources/new_game.png");
@@ -146,6 +148,9 @@ int main()
     lostGamePoz.h = 50;
     lostGamePoz.x = 200;
     lostGamePoz.y = 100;
+
+    // -----------------------------------
+
     /*TTF_Font* Sans = TTF_OpenFont("sans.ttf", 24);
     if(!Sans) {
     printf("TTF_OpenFont: %s\n", TTF_GetError());
@@ -168,28 +173,33 @@ int main()
     dest.w = playerWidth;
     dest.h = playerHeight;
 
-    // sets initial x-position of object
+    // sets initial x-position of player
     dest.x = playerStartX;
 
-    // sets initial y-position of object
+    // sets initial y-position of player
     dest.y = playerStartY;
 
     // controls annimation loop
     int close = 0;
 
-    // speed of box
-    //return 0;
-    // annimation loop
+    //current level counter
     int cnt = 0;
     stack <string> game_state;
     game_state.push("QUIT");
     game_state.push("MENU");
+    /*
+        | MENU |
+        | QUIT |
+--initial stack, quits when "QUIT" is at the top--
+    */
+
     unsigned int start = 0;
 
-    unsigned int copie = start;
+    //unsigned int copie = start;
     bool started = false;
     bool create_level = false;
     bool paused = false;
+    //counting the number of seconds the game was paused
     unsigned int total = 0;
     bool winning = false;
     unsigned int in;
@@ -202,7 +212,7 @@ int main()
                     case SDL_QUIT:
                         game_state.pop();
                         break;
-
+                    //checks clicks in main menu
                     case SDL_MOUSEBUTTONDOWN:
                         if(event.motion.x >= newGamePoz.x && event.motion.x <= newGamePoz.x + newGamePoz.w
                             && event.motion.y >= newGamePoz.y && event.motion.y <= newGamePoz.y + newGamePoz.h)
@@ -235,19 +245,21 @@ int main()
         else if(state == "GAME"){
         if(!started){
             start = SDL_GetTicks();
-            //total = 0;
             started = true;
+            //wait one second
+            SDL_Delay(1000);
         }
         unsigned int t = 999999;
         if(SDL_GetTicks() < t){
         cout<<SDL_GetTicks()<<" "<<total<<" "<<start<<"\n";
+        //check if 35 seconds passed since starting the game
         if(SDL_GetTicks() - total - start >= 35000){
             game_state.pop();
             game_state.push("ENDING");
         }
         }
         if(!create_level){
-
+                //displaying walls texture
                 SDL_Surface* surface;
                 f >> nWalls;
 
@@ -284,7 +296,7 @@ int main()
                 // handling of close button
                 game_state.pop();
                 break;
-
+            //moving the player
             case SDL_KEYDOWN:
                 // keyboard API for key pressed
                 switch (event.key.keysym.scancode) {
@@ -310,7 +322,7 @@ int main()
                 }
             }
         }
-
+        //delete everything from the level at the green square
         if(dest.x == 790 && dest.y == 790)
             {
                 dest.x = 100;
@@ -362,6 +374,8 @@ int main()
         y = collision[i].get_y();
         w = collision[i].get_w();
         h = collision[i].get_h();
+
+        //COLLISIONS
         if(dest.y == y && dest.x >= x && dest.x < x + w)
             dest.y = y - dest.h;
 
@@ -512,7 +526,7 @@ int main()
         }
     }
 
-    // destroy texture
+    // destroy textures
     SDL_DestroyTexture(playerTex);
     SDL_DestroyTexture(newGameTex);
     SDL_DestroyTexture(quitGameTex);
