@@ -10,7 +10,7 @@ SDL provides support for 2D pixel operations, sound, file access, event handling
 sudo apt install libsdl2-dev
 sudo apt install libsdl2-image-dev
 ```
-In order to compile SDL 2 code, we have to tell the compiler to link against the libraries.
+In order to compile SDL 2 code, we have to tell the compiler to link against the libraries.(Code::Blocks IDE)
 ![linker](https://user-images.githubusercontent.com/44977942/110235525-22e18300-7f39-11eb-9a1e-2c9621d33c80.png)
 
 
